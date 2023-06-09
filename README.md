@@ -1,6 +1,14 @@
 # load-test-sample
 Load test spring web app sample with observability
 
+## Technologies
+- spring webflux
+- k6
+- grafana
+- prometheus
+- docker
+- wiremock
+
 ## Prerequisites
 - ### K6 installation on Ubuntu
     ```bash
@@ -11,14 +19,86 @@ Load test spring web app sample with observability
     sudo apt-get install k6
     ```
 
-- ### Java 11
+- ### Java 17
 
-## Technologies
-- spring webflux
-- k6
-- grafana
-- prometheus
-- docker
+## Run
+  ```bash
+  docker-compose build
+  ```
+
+  ```bash
+  docker-compose up
+  ```
+
+  Run to project directory and run:
+  ```bash
+  k6 run load-test.js
+  ```
+
+  ## Grafana dashboards id's used
+  - 12900
+  - 4701 (JVM Micrometer)
+
+  ## URI's
+  - Grafana: http://localhost:3000
+  - Prometheus: http://localhost:9090
+  - Prometheus for add in Grafana: http://10.5.0.4:9090
+  - API: GET: http://localhost:8081/v1/characters/1
+
+  ## WireMock Config
+  Add mock URI:
+```curl
+curl --location 'http://localhost:8080/__admin/mappings/import' \
+--header 'Content-Type: application/json' \
+--data '{
+    "mappings": [
+        {
+            "request": {
+                "method": "GET",
+                "url": "/api/character/1"
+            },
+            "response": {
+                "status": 200,
+                "jsonBody": {
+                    "id": 1,
+                    "name": "Rick Sanchez",
+                    "status": "Alive",
+                    "species": "Human",
+                    "type": "",
+                    "gender": "Male",
+                    "origin": {
+                        "name": "Earth (C-137)",
+                        "url": "https://rickandmortyapi.com/api/location/1"
+                    },
+                    "location": {
+                        "name": "Earth (Replacement Dimension)",
+                        "url": "https://rickandmortyapi.com/api/location/20"
+                    },
+                    "image": "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
+                    "episode": [
+                        "https://rickandmortyapi.com/api/episode/1",
+                        "https://rickandmortyapi.com/api/episode/2"
+                    ],
+                    "url": "https://rickandmortyapi.com/api/character/1",
+                    "created": "2017-11-04T18:48:46.250Z"
+                },
+                "headers": {
+                    "Content-Type": "application/json"
+                }
+            }
+        }
+    ],
+    "importOptions": {
+        "duplicatePolicy": "IGNORE",
+        "deleteAllNotInImport": true
+    }
+}'
+```
+
+Check if mock is OK:
+```curl
+curl --location 'http://localhost:8080/api/character/1'
+```
 
 ## References
 - https://k6.io/docs/get-started/running-k6/

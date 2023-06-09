@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+  api_service:
+    build: .
+    restart: always
+    ports:
+      - "8081:8081"
+    networks:
+      network-example:
+        ipv4_address: 10.5.0.2
+
+  wiremock:
+    image: wiremock/wiremock:2.35.0
+    ports:
+      - "8080:8080"
+    networks:
+      network-example:
+        ipv4_address: 10.5.0.3
+
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    container_name: prometheus-container
+    volumes:
+      - ./:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    restart: always
+    networks:
+      network-example:
+        ipv4_address: 10.5.0.4
+
+  grafana:
+    image: grafana/grafana-oss:9.1.4
+    user: "$UID:$GID"
+    container_name: grafana-container
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=localhost
+    networks:
+      network-example:
+        ipv4_address: 10.5.0.5
+
+networks:
+  network-example:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
