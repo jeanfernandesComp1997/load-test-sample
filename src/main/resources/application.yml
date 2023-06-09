@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: webfluxapi
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: [ "health","prometheus", "metrics" ]
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+server:
+  port: 8081
+
+http:
+  #rickAndMortyBaseUri: "https://rickandmortyapi.com/api"
+  rickAndMortyBaseUri: http://10.5.0.3:8080/api
+  timeoutInSeconds: 5
