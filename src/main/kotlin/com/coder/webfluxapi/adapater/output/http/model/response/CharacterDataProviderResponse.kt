@@ -1,4 +1,4 @@
-package com.coder.webfluxapi.adapater.output.http.model
+package com.coder.webfluxapi.adapater.output.http.model.response
 
 data class CharacterDataProviderResponse(
     val id: Int,
@@ -8,9 +8,14 @@ data class CharacterDataProviderResponse(
     val type: String,
     val gender: String,
     val origin: CharacterOriginResponse,
-    val image: String
+    val image: String,
+    val location: CharacterLocationResponse
 )
 
 data class CharacterOriginResponse(
     val name: String
+)
+
+data class CharacterLocationResponse(
+    val url: String
 )
