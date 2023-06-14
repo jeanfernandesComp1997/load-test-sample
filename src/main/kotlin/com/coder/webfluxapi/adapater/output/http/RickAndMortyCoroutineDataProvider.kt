@@ -2,6 +2,7 @@ package com.coder.webfluxapi.adapater.output.http
 
 import com.coder.webfluxapi.adapater.output.http.model.response.CharacterDataProviderResponse
 import com.coder.webfluxapi.adapater.output.http.model.response.LocationDataProviderResponse
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -14,12 +15,12 @@ import reactor.util.retry.Retry
 import java.time.Duration
 
 @Component
-class RickAndMortyDataProvider(
+class RickAndMortyCoroutineDataProvider(
     @Qualifier("createRickAndMortyWebClient")
     private val webClient: WebClient
 ) {
 
-    fun findById(id: Int): Mono<CharacterDataProviderResponse> {
+    suspend fun findById(id: Int): CharacterDataProviderResponse {
         return webClient.get()
             .uri("/character/$id")
             .accept(MediaType.APPLICATION_JSON)
@@ -44,9 +45,10 @@ class RickAndMortyDataProvider(
                         throw RuntimeException("RickAndMorty findById Client failed to process after max retries")
                     }
             )
+            .awaitSingle()
     }
 
-    fun findLocationById(id: Int): Mono<LocationDataProviderResponse> {
+    suspend fun findLocationById(id: Int): LocationDataProviderResponse {
         return webClient.get()
             .uri("/location/$id")
             .accept(MediaType.APPLICATION_JSON)
@@ -71,5 +73,6 @@ class RickAndMortyDataProvider(
                         throw RuntimeException("RickAndMorty findLocationById Client failed to process after max retries")
                     }
             )
+            .awaitSingle()
     }
 }

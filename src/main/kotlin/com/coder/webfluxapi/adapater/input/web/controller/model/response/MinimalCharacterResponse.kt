@@ -1,4 +1,4 @@
-package com.coder.webfluxapi.adapater.input.web.controller.model
+package com.coder.webfluxapi.adapater.input.web.controller.model.response
 
 import com.coder.webfluxapi.domain.entitie.CartoonCharacter
 import com.fasterxml.jackson.annotation.JsonProperty
