@@ -8,6 +8,7 @@ import com.coder.webfluxapi.application.utils.Utils
 import com.coder.webfluxapi.domain.entitie.CartoonCharacter
 import com.coder.webfluxapi.domain.entitie.Location
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
@@ -28,6 +29,15 @@ class CharacterServiceImpl(
     override fun retrieveCharacterByIdWithLocation(id: Int): Mono<CartoonCharacter> {
         return rickAndMortyDataProvider
             .findById(id)
+            .flatMap { characterDataProviderResponse: CharacterDataProviderResponse ->
+                val locationId = Utils.extractLocationId(characterDataProviderResponse.location.url)
+                addAddressToCharacter(characterDataProviderResponse, locationId)
+            }
+    }
+
+    override fun retrieveMultipleCharactersById(ids: Array<Int>): Flux<CartoonCharacter> {
+        return rickAndMortyDataProvider
+            .retrieveMultipleCharacters(ids)
             .flatMap { characterDataProviderResponse: CharacterDataProviderResponse ->
                 val locationId = Utils.extractLocationId(characterDataProviderResponse.location.url)
                 addAddressToCharacter(characterDataProviderResponse, locationId)

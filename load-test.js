@@ -8,5 +8,4 @@ export const options = {
 export default function () {
   const res = http.get('http://localhost:8081/v1/characters/1');
   check(res, { 'status was 200': (r) => r.status == 200 });
-  sleep(1);
 }

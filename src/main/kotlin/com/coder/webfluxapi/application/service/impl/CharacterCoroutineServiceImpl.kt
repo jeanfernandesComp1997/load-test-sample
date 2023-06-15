@@ -5,6 +5,8 @@ import com.coder.webfluxapi.application.service.CharacterCoroutineService
 import com.coder.webfluxapi.application.utils.Utils
 import com.coder.webfluxapi.domain.entitie.CartoonCharacter
 import com.coder.webfluxapi.domain.entitie.Location
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
 
 @Service
@@ -33,5 +35,18 @@ class CharacterCoroutineServiceImpl(
                 character,
                 location
             )
+    }
+
+    override fun retrieveMultipleCharactersById(ids: Array<Int>): Flow<CartoonCharacter> {
+        return rickAndMortyDataProvider
+            .retrieveMultipleCharacters(ids)
+            .map {
+                val location = rickAndMortyDataProvider.findLocationById(Utils.extractLocationId(it.location.url))
+                CartoonCharacter
+                    .createCartoonCharacterWithLocation(
+                        it,
+                        Location.createLocation(location)
+                    )
+            }
     }
 }
