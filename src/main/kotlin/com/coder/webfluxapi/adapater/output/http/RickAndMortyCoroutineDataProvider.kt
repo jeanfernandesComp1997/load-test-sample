@@ -2,6 +2,8 @@ package com.coder.webfluxapi.adapater.output.http
 
 import com.coder.webfluxapi.adapater.output.http.model.response.CharacterDataProviderResponse
 import com.coder.webfluxapi.adapater.output.http.model.response.LocationDataProviderResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatusCode
@@ -74,5 +76,33 @@ class RickAndMortyCoroutineDataProvider(
                     }
             )
             .awaitSingle()
+    }
+
+    fun retrieveMultipleCharacters(ids: Array<Int>): Flow<CharacterDataProviderResponse> {
+        return webClient.get()
+            .uri("/character/${ids.contentToString()}")
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .onStatus({ code: HttpStatusCode -> code.is5xxServerError },
+                { response: ClientResponse ->
+                    Mono.error(
+                        IllegalArgumentException("Error retrieving character. ${response.bodyToMono<String>()}")
+                    )
+                })
+            .bodyToFlux(CharacterDataProviderResponse::class.java)
+            .retryWhen(
+                Retry
+                    .fixedDelay(
+                        3,
+                        Duration.ofSeconds(2)
+                    )
+                    .filter { throwable: Throwable ->
+                        throwable is IllegalArgumentException
+                    }
+                    .onRetryExhaustedThrow { _, _ ->
+                        throw RuntimeException("RickAndMorty findById Client failed to process after max retries")
+                    }
+            )
+            .asFlow()
     }
 }

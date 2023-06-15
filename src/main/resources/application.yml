@@ -19,6 +19,7 @@ server:
   port: 8081
 
 http:
-  #rickAndMortyBaseUri: "https://rickandmortyapi.com/api"
-  rickAndMortyBaseUri: http://10.5.0.3:8080/api
+  rickAndMortyBaseUri: "https://rickandmortyapi.com/api"
+  #rickAndMortyBaseUri: http://10.5.0.3:8080/api
+  #rickAndMortyBaseUri: http://localhost:8080/api
   timeoutInSeconds: 5
